@@ -144,3 +144,20 @@ def updateDepartment(request):
 		data['errormsg'] = "department does not exist"
 
 	return JsonResponse(data, safe=False)
+
+@login_required(login_url='/accounts/login/')
+def getPersonnelById(request):
+	data = {}
+	try:
+		personnel = Profile.objects.get(pk=request.GET['personnelID'])
+		data['firstName'] = personnel.firstName
+		data['middleName'] = personnel.middleName
+		data['lastName'] = personnel.lastName
+		data['email'] = personnel.email
+		data['contactNumber'] = personnel.contactNumber
+		data['department'] = personnel.department.pk
+		data['status'] = "Success"
+	except:
+		data['status'] = "Failed"
+		data['errormsg'] = "personnel id does not exist"
+	return JsonResponse(data, safe=False)

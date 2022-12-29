@@ -10,4 +10,5 @@ urlpatterns = [
     path('update_department', views.updateDepartment, name='updateDepartment'),
     path('check_personnel', views.checkPersonnel, name='checkPersonnel'),
     path('create_personnel', views.createPersonnel, name='createPersonnel'),
+    path('get_personnel_id', views.getPersonnelById, name='getPersonnelById'),
 ]

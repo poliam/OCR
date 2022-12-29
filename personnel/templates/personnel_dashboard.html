@@ -73,7 +73,7 @@
                     <td>{{personnel.department.departmentName}}</td>
                     <td>{{personnel.status}}</td>
                  	<td>
-                 		<svg style="cursor: pointer;" onclick="EditPersonnelModal();" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                 		<svg style="cursor: pointer;" onclick="EditPersonnelModal({{personnel.pk}});" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   							<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   							<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
 						</svg>
@@ -280,15 +280,15 @@
         		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       		</div>
       		<div class="modal-body">
-      			<div class="alert alert-warning" id="EditdepartmentAlert" role="alert" style="display: none;"></div>
-      			<div class="alert alert-success" id="EditdepartmentProgressBar" role="alert" style="display:none;"></div>
+      			<div class="alert alert-warning" id="EditPersonnelAlert" role="alert" style="display: none;"></div>
+      			<div class="alert alert-success" id="EditPersonnelProgressBar" role="alert" style="display:none;">LOADING . . .</div>
         		<form id="PersonelEdit_form">
 					{% csrf_token %}
 					<div class="row">
         				<div class="col-sm-12">
         					<div class="mb-3">
 	    						<label for="FirstName" class="form-label">First Name</label>
-	    						<input type="text" class="form-control" name="FirstName" id="FirstName" aria-describedby="FirstNameHelp">
+	    						<input type="text" class="form-control" name="EditFirstName" id="EditFirstName" aria-describedby="FirstNameHelp">
 	  						</div>
         				</div>	
         			</div>
@@ -296,13 +296,13 @@
         				<div class="col-sm-6">
         					<div class="mb-3">
 			    				<label for="MiddleName" class="form-label">Middle Name</label>
-			    				<input type="text" class="form-control" name="MiddleName" id="MiddleName" aria-describedby="MiddleNameHelp">
+			    				<input type="text" class="form-control" name="EditMiddleName" id="EditMiddleName" aria-describedby="MiddleNameHelp">
 			  				</div>
         				</div>
         				<div class="col-sm-6">
         					<div class="mb-3">
 			    				<label for="LastName" class="form-label">Last Name</label>
-			    				<input type="text" class="form-control" name="LastName" id="LastName" aria-describedby="UsernameHelp">
+			    				<input type="text" class="form-control" name="EditLastName" id="EditLastName" aria-describedby="UsernameHelp">
 			  				</div>
         				</div>
         			</div>
@@ -310,19 +310,19 @@
 						<div class="col-sm-7">
 							<div class="mb-3">
 			    				<label for="Email" class="form-label">Email</label>
-			    				<input type="text" class="form-control" name="Email" id="Email" aria-describedby="EmailHelp">
+			    				<input type="text" class="form-control" name="EditEmail" id="EditEmail" aria-describedby="EmailHelp">
 			  				</div>
 						</div>
 						<div class="col-sm-5">
 							<div class="mb-3">
 			    				<label for="ContactNumber" class="form-label">Contact Number</label>
-			    				<input type="text" class="form-control" name="ContactNumber" id="ContactNumber" aria-describedby="ContactNumberHelp">
+			    				<input type="text" class="form-control" name="EditContactNumber" id="EditContactNumber" aria-describedby="ContactNumberHelp">
 			  				</div>
 						</div>
 					</div>
 	  				<div class="mb-3">
 	    				<label for="exampleInputEmail1" class="form-label">Department*</label>
-	    				<select class="form-select" id="Department" name="Department">
+	    				<select class="form-select" id="EditDepartment" name="EditDepartment">
 	    					{% for dept in listDept %}
 	    						{% if forloop.counter == 1 %}
 	    							<option value='0'>- Select Department -</option>
@@ -335,27 +335,12 @@
 	    					{% endfor %}
 	    				</select>
 	  				</div>
-	  				<div class="mb-3">
-	    				<label for="exampleInputEmail1" class="form-label">Username</label>
-	    				<input type="text" class="form-control" name="Username" id="Username" aria-describedby="UsernameHelp">
-	  				</div>
-	  				<div class="mb-3">
-	    				<label for="Password" class="form-label">Password</label>
-	    				<input type="password" class="form-control" name="Password" id="Password" aria-describedby="PasswordHelp">
-	    				<div class="help" id="id_password1_helptext">
-                          <ul>
-                          	<li>Your password can’t be too similar to your other personal information.</li>
-                          	<li>Your password must contain at least 8 characters.</li>
-                          	<li>Your password can’t be a commonly used password.</li>
-                          	<li>Your password can’t be entirely numeric.</li></ul>
-                        </div>
-	  				</div>
 	  				<input type="hidden" name="editPersonnelId" id="editPersonnelId">
 				</form>
       		</div>
       		<div class="modal-footer">
         		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        		<button type="button" class="btn btn-primary" id="EditDepartmentbtn" onclick="EditPersonelForm()">Update Department</button>
+        		<button type="button" class="btn btn-primary" id="EditPersonnelBtn" onclick="EditPersonelForm()">Update Department</button>
       		</div>
     	</div>
   	</div>
@@ -491,8 +476,46 @@
 
 	}
 
-	function EditPersonnelModal(){
+	function EditPersonnelModal(personnelID){
 		$("#EditPersonnelModal").modal("show");
+		$("#EditFirstName").val("");
+    	$("#EditMiddleName").val("");
+    	$("#EditLastName").val("");
+    	$("#EditEmail").val("");
+    	$("#EditContactNumber").val("");
+    	$("#EditDepartment").val("");
+    	$("#editPersonnelId").val("");
+    	$("#EditPersonnelProgressBar").show();
+		$.ajax({
+	        type: "GET",
+	        url: "{% url 'getPersonnelById' %}",
+	        data: {"personnelID": personnelID},
+	        async:true,
+	        success: function (data) {
+	            if(data.status == "Success"){
+	            	$("#EditFirstName").val(data.firstName);
+	            	$("#EditMiddleName").val(data.middleName);
+	            	$("#EditLastName").val(data.lastName);
+	            	$("#EditEmail").val(data.email);
+	            	$("#EditContactNumber").val(data.contactNumber);
+	            	$("#EditDepartment").val(data.department);
+	            	$("#editPersonnelId").val(personnelID);
+	            	$("#EditPersonnelProgressBar").hide();
+	            }else{
+	            	$("#EditdepartmentAlert").empty();
+	            	$("#EditdepartmentAlert").append(data.errormsg);
+	            	$("#EditdepartmentAlert").show();
+	            	setTimeout(function(){
+						$("#EditPersonnelAlert").hide("1000");
+					}, 4000);
+	            	$('#EditPersonnelBtn').prop("disabled", false);
+	            }
+	        },
+	        error: function (e) {
+	            alert("Error! please try again later.");
+	        }
+	    })
+
 	}
 
 	function EditDepartmentForm(){
