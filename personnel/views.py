@@ -31,7 +31,6 @@ def createDepartment(request):
 @login_required(login_url='/accounts/login/')
 def getDepartmentByName(request):
 	data = {}
-	request.GET['deptId']
 	if 'editDepartmentId' not in request.GET:
 	   deptId = 0
 	else:
