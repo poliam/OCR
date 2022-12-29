@@ -27,7 +27,7 @@ urlpatterns = [
     path("trialPDF/", OCRViews.trialPDF, name="trialPDF"),
     path("trialImage/", OCRViews.trialImage, name="trialImage"),
     path("accounts/", include("django.contrib.auth.urls")),  # new
-    # path('personnel/', include('personnel.urls')),
+    path('personnel/', include('personnel.urls')),
     # path('documents/', include('documents.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

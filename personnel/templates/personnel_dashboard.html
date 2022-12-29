@@ -1,0 +1,687 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Personnel Dashboard</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/mainstyle.css' %}">
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+</head>
+<body>
+{% include "includes/header.html" %}
+
+<br><br>
+
+<div class="container">
+	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    	<h1 class="h3 mb-0 text-gray-800">Personnel Dashboard</h1>
+	</div>
+	<div class="row">
+		<div class="col-xl-6 col-md-6 mb-6" style="cursor: pointer;" onclick="SelectPersonnelTab();">
+            <div class="card border-left-primary shadow h-100 py-2" id="personnelBoardBtn" style="background:lightgreen;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                           	<div class="text-xs font-weight-bold text-primary text-uppercase mb-1" id="personnelBtn">Personnel</div>
+                      	</div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+		<div class="col-xl-6 col-md-6 mb-6" style="cursor: pointer;" onclick="SelectDepartmentTab();">
+            <div class="card border-left-success shadow h-100 py-2" id="departmentBoardBtn">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1" id='deptpartmentBtn'>Department</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-folder fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+</div><br><br>
+<div class="container" id="personnel_container">
+	<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  		<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreatePersonnelModal">CREATE NEW PERSONNEL</button>
+	</div><br/>
+	<table id="Personnel_table" class="table table-info table-striped">
+		<thead>
+	    	<tr>
+	      		<th scope="col">#</th>
+	      		<th scope="col">Name</th>
+	      		<th scope="col">Email</th>
+	      		<th scope="col">Department</th>
+	      		<th scope="col">Status</th>
+	      		<th scope="col">Options</th>
+	    	</tr>
+	  	</thead>
+	  	<tbody>
+	    	{% for personnel in listPersonnel %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{personnel.lastName}}, {{ personnel.firstName }} {{ personnel.middleName }}</td>
+                    <td>{{personnel.email}}</td>
+                    <td>{{personnel.department.departmentName}}</td>
+                    <td>{{personnel.status}}</td>
+                 	<td>
+                 		<svg style="cursor: pointer;" onclick="EditPersonnelModal();" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+  							<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  							<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+						</svg>
+                 	</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4"><center><em>No Personnel in the database.</em></center></td>
+                </tr>
+            {% endfor %}
+	  	</tbody>
+	</table>
+</div>
+<div class="container" id="department_container" style="display:none;">
+	<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  		<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#DepartmentModal">CREATE NEW DEPARTMENT</button>
+	</div><br/>
+
+	<table id="Department_table" class="table table-info table-striped">
+		<thead>
+	    	<tr>
+	      		<th scope="col">#</th>
+	      		<th scope="col">Department</th>
+	      		<th scope="col">Status</th>
+	      		<th scope="col">Actions</th>
+	    	</tr>
+	  	</thead>
+	  	<tbody>
+	    	{% for dept in listDept %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{dept.departmentName}}</td>
+                    <td>{{dept.status}}</td>
+                 	<td>
+                 		<svg onclick="EditDepartment({{dept.pk}});" style="cursor: pointer;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+  							<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  							<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+						</svg>
+                 	</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4"><center><em>No Department in the database.</em></center></td>
+                </tr>
+            {% endfor %}
+	  	</tbody>
+	</table>
+</div>
+<!-- Create Users -->
+<div class="modal fade" id="CreatePersonnelModal" tabindex="-1" aria-labelledby="PersonaleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog">
+    	<div class="modal-content">
+     		 <div class="modal-header">
+        		<h5 class="modal-title" id="exampleModalLabel">Create New User</h5>
+        		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      		</div>
+      		<div class="modal-body">
+      			<div class="alert alert-warning" id="personnelAlert" role="alert" style="display: none;"></div>
+      			<div class="alert alert-success" id="personnelProgressBar" role="alert" style="display:none;"></div>
+        		<form id="personnel_form">
+        			{% csrf_token %}
+        			<div class="row">
+        				<div class="col-sm-12">
+        					<div class="mb-3">
+	    						<label for="FirstName" class="form-label">First Name</label>
+	    						<input type="text" class="form-control" name="FirstName" id="FirstName" aria-describedby="FirstNameHelp">
+	  						</div>
+        				</div>	
+        			</div>
+        			<div class="row">
+        				<div class="col-sm-6">
+        					<div class="mb-3">
+			    				<label for="MiddleName" class="form-label">Middle Name</label>
+			    				<input type="text" class="form-control" name="MiddleName" id="MiddleName" aria-describedby="MiddleNameHelp">
+			  				</div>
+        				</div>
+        				<div class="col-sm-6">
+        					<div class="mb-3">
+			    				<label for="LastName" class="form-label">Last Name</label>
+			    				<input type="text" class="form-control" name="LastName" id="LastName" aria-describedby="UsernameHelp">
+			  				</div>
+        				</div>
+        			</div>
+					<div class="row">
+						<div class="col-sm-7">
+							<div class="mb-3">
+			    				<label for="Email" class="form-label">Email</label>
+			    				<input type="text" class="form-control" name="Email" id="Email" aria-describedby="EmailHelp">
+			  				</div>
+						</div>
+						<div class="col-sm-5">
+							<div class="mb-3">
+			    				<label for="ContactNumber" class="form-label">Contact Number</label>
+			    				<input type="text" class="form-control" name="ContactNumber" id="ContactNumber" aria-describedby="ContactNumberHelp">
+			  				</div>
+						</div>
+					</div>
+	  				<div class="mb-3">
+	    				<label for="exampleInputEmail1" class="form-label">Department*</label>
+	    				<select class="form-select" id="Department" name="Department">
+	    					{% for dept in listDept %}
+	    						{% if forloop.counter == 1 %}
+	    							<option value='0'>- Select Department -</option>
+	    							<option value='{{ dept.pk  }}'>{{ dept.departmentName }}</option>
+	    						{% else %}
+	    							<option value='{{ dept.pk  }}'>{{ dept.departmentName }}</option>
+	    						{% endif %}
+	    					{% empty %}
+	    						<option value='0'>- Select Department -</option>
+	    					{% endfor %}
+	    				</select>
+	  				</div>
+	  				<div class="mb-3">
+	    				<label for="exampleInputEmail1" class="form-label">Username</label>
+	    				<input type="text" class="form-control" name="Username" id="Username" aria-describedby="UsernameHelp">
+	  				</div>
+	  				<div class="mb-3">
+	    				<label for="Password" class="form-label">Password</label>
+	    				<input type="password" class="form-control" name="Password" id="Password" aria-describedby="PasswordHelp">
+	    				<div class="help" id="id_password1_helptext">
+                          <ul>
+                          	<li>Your password can’t be too similar to your other personal information.</li>
+                          	<li>Your password must contain at least 8 characters.</li>
+                          	<li>Your password can’t be a commonly used password.</li>
+                          	<li>Your password can’t be entirely numeric.</li></ul>
+                        </div>
+	  				</div>
+				</form>
+      		</div>
+      		<div class="modal-footer">
+        		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+        		<button type="button" class="btn btn-primary" onclick="submitPersonnelForm();">Create</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+
+<div class="modal fade" id="DepartmentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<h5 class="modal-title" id="exampleModalLabel">NEW DEPARTMENT</h5>
+        		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      		</div>
+      		<div class="modal-body">
+      			<div class="alert alert-warning" id="departmentAlert" role="alert" style="display: none;"></div>
+      			<div class="alert alert-success" id="departmentProgressBar" role="alert" style="display:none;"></div>
+        		<form id="department_form">
+					{% csrf_token %}
+					<div class="mb-3">
+		    			<label for="DepartmentName" class="form-label">DEPARTMENT NAME</label>
+		    			<input type="text" class="form-control" name="DepartmentName" id="DepartmentName" aria-describedby="DepartmentNameHelp">
+		  			</div>
+				</form>
+      		</div>
+      		<div class="modal-footer">
+        		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        		<button type="button" class="btn btn-primary" id="createDepartment" onclick="submitDepartmentForm()">Create Department</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+
+
+<div class="modal fade" id="EditDepartmentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<h5 class="modal-title" id="exampleModalLabel">EDIT DEPARTMENT</h5>
+        		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      		</div>
+      		<div class="modal-body">
+      			<div class="alert alert-warning" id="EditdepartmentAlert" role="alert" style="display: none;"></div>
+      			<div class="alert alert-success" id="EditdepartmentProgressBar" role="alert" style="display:none;"></div>
+        		<form id="departmentEdit_form">
+					{% csrf_token %}
+					<div class="mb-3">
+		    			<label for="DepartmentName" class="form-label">DEPARTMENT NAME</label>
+		    			<input type="text" class="form-control" name="EditDepartmentName" id="EditDepartmentName" aria-describedby="DepartmentNameHelp">
+		  			</div>
+		  			<div class="mb-3">
+	    				<label for="exampleInputEmail1" class="form-label">STATUS</label>
+	    				<select class="form-select" id="EditDepartmentStatus" name="EditDepartmentStatus">
+	    					<option value="active">ACTIVE</option>
+	    					<option value="deactive">DEACTIVE</option>
+	    				</select>
+	  				</div>
+	  				<input type="hidden" name="editDepartmentId" id="editDepartmentId">
+				</form>
+      		</div>
+      		<div class="modal-footer">
+        		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        		<button type="button" class="btn btn-primary" id="EditDepartmentbtn" onclick="EditDepartmentForm()">Update Department</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+
+<div class="modal fade" id="EditPersonnelModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<h5 class="modal-title" id="exampleModalLabel">EDIT PERSONNEL</h5>
+        		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      		</div>
+      		<div class="modal-body">
+      			<div class="alert alert-warning" id="EditdepartmentAlert" role="alert" style="display: none;"></div>
+      			<div class="alert alert-success" id="EditdepartmentProgressBar" role="alert" style="display:none;"></div>
+        		<form id="PersonelEdit_form">
+					{% csrf_token %}
+					<div class="row">
+        				<div class="col-sm-12">
+        					<div class="mb-3">
+	    						<label for="FirstName" class="form-label">First Name</label>
+	    						<input type="text" class="form-control" name="FirstName" id="FirstName" aria-describedby="FirstNameHelp">
+	  						</div>
+        				</div>	
+        			</div>
+        			<div class="row">
+        				<div class="col-sm-6">
+        					<div class="mb-3">
+			    				<label for="MiddleName" class="form-label">Middle Name</label>
+			    				<input type="text" class="form-control" name="MiddleName" id="MiddleName" aria-describedby="MiddleNameHelp">
+			  				</div>
+        				</div>
+        				<div class="col-sm-6">
+        					<div class="mb-3">
+			    				<label for="LastName" class="form-label">Last Name</label>
+			    				<input type="text" class="form-control" name="LastName" id="LastName" aria-describedby="UsernameHelp">
+			  				</div>
+        				</div>
+        			</div>
+					<div class="row">
+						<div class="col-sm-7">
+							<div class="mb-3">
+			    				<label for="Email" class="form-label">Email</label>
+			    				<input type="text" class="form-control" name="Email" id="Email" aria-describedby="EmailHelp">
+			  				</div>
+						</div>
+						<div class="col-sm-5">
+							<div class="mb-3">
+			    				<label for="ContactNumber" class="form-label">Contact Number</label>
+			    				<input type="text" class="form-control" name="ContactNumber" id="ContactNumber" aria-describedby="ContactNumberHelp">
+			  				</div>
+						</div>
+					</div>
+	  				<div class="mb-3">
+	    				<label for="exampleInputEmail1" class="form-label">Department*</label>
+	    				<select class="form-select" id="Department" name="Department">
+	    					{% for dept in listDept %}
+	    						{% if forloop.counter == 1 %}
+	    							<option value='0'>- Select Department -</option>
+	    							<option value='{{ dept.pk  }}'>{{ dept.departmentName }}</option>
+	    						{% else %}
+	    							<option value='{{ dept.pk  }}'>{{ dept.departmentName }}</option>
+	    						{% endif %}
+	    					{% empty %}
+	    						<option value='0'>- Select Department -</option>
+	    					{% endfor %}
+	    				</select>
+	  				</div>
+	  				<div class="mb-3">
+	    				<label for="exampleInputEmail1" class="form-label">Username</label>
+	    				<input type="text" class="form-control" name="Username" id="Username" aria-describedby="UsernameHelp">
+	  				</div>
+	  				<div class="mb-3">
+	    				<label for="Password" class="form-label">Password</label>
+	    				<input type="password" class="form-control" name="Password" id="Password" aria-describedby="PasswordHelp">
+	    				<div class="help" id="id_password1_helptext">
+                          <ul>
+                          	<li>Your password can’t be too similar to your other personal information.</li>
+                          	<li>Your password must contain at least 8 characters.</li>
+                          	<li>Your password can’t be a commonly used password.</li>
+                          	<li>Your password can’t be entirely numeric.</li></ul>
+                        </div>
+	  				</div>
+	  				<input type="hidden" name="editPersonnelId" id="editPersonnelId">
+				</form>
+      		</div>
+      		<div class="modal-footer">
+        		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        		<button type="button" class="btn btn-primary" id="EditDepartmentbtn" onclick="EditPersonelForm()">Update Department</button>
+      		</div>
+    	</div>
+  	</div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+	$(document).ready( function () {
+	    $('#Personnel_table').DataTable();
+	    $("#Department_table").DataTable();
+	    var params = new window.URLSearchParams(window.location.search);
+		if (params.get('target') == "Dept"){
+			SelectDepartmentTab();
+		};
+	} );
+
+	
+
+	function SelectPersonnelTab(){
+		$("#personnel_container").show();
+		$("#department_container").hide();
+
+		$("#personnelBtn").attr("class", "text-xs font-weight-bold text-primary text-uppercase mb-1");
+		$("#deptpartmentBtn").attr("class", "text-xs font-weight-bold text-secondary text-uppercase mb-1");
+
+		$("#personnelBoardBtn").css("background", "lightgreen");
+		$("#departmentBoardBtn").css("background", "white");
+	}
+
+	
+	function SelectDepartmentTab(){
+		$("#personnel_container").hide();
+		$("#department_container").show();
+
+		$("#personnelBtn").attr("class", "text-xs font-weight-bold text-secondary text-uppercase mb-1");
+		$("#deptpartmentBtn").attr("class", "text-xs font-weight-bold text-primary text-uppercase mb-1");
+
+		$("#personnelBoardBtn").css("background", "white");
+		$("#departmentBoardBtn").css("background", "lightgreen");
+	}
+
+	function submitDepartmentForm(){
+		$("#departmentProgressBar").empty();
+		$("#departmentProgressBar").append("Checking. . . ");
+		$("#departmentProgressBar").show();
+		$("#createDepartment"). attr('disabled','disabled');
+		var departmentName = $("#DepartmentName").val();
+		$.ajax({
+	        type: "GET",
+	        url: "{% url 'getDepartmentByName' %}",
+	        data: {"DepartmentName": departmentName},
+	        async:false,
+	        success: function (data) {
+	            if(data.status == "available"){
+	            	$("#departmentProgressBar").empty();
+					$("#departmentProgressBar").append("Creating. . . ");
+	            	var departmentForm = $("#department_form").serializeArray();
+					$.ajax({
+			            type: "POST",
+			            url: "{% url 'createDepartment' %}",
+			            data: departmentForm,
+			            async:false,
+			            success: function (data) {
+			            	$("#departmentProgressBar").empty();
+							$("#departmentProgressBar").append("Department Created!");
+							var params = new window.URLSearchParams(window.location.search);
+							if (params.get('target') == "Dept"){
+								location.reload(true);
+							}else{
+								window.location.search += 'target=Dept';
+							}
+			                
+			            },
+			            error: function (e) {
+			                alert("Error! please try again later.");
+			            }
+			        })
+	            }else{
+	            	$("#departmentAlert").empty();
+	            	$("#departmentAlert").append(data.errormsg);
+	            	$("#departmentAlert").show();
+	            	setTimeout(function(){
+						$("#departmentAlert").hide("1000");
+					}, 4000);
+	            	$('#createDepartment').prop("disabled", false);
+	            }
+	        },
+	        error: function (e) {
+	            alert("Error! please try again later.");
+	        }
+	    })
+		
+	}
+
+
+	function EditDepartment(id){
+		$("#EditDepartmentModal").modal("show");
+		$("#EditdepartmentProgressBar").empty();
+		$("#EditdepartmentProgressBar").show();
+		$("#EditdepartmentProgressBar").append("retrieving data . . .");
+		$("#EditDepartmentName").val("");
+	    $("#EditDepartmentStatus").val("");
+	    $("#editDepartmentId").val("");
+		$.ajax({
+	        type: "GET",
+	        url: "{% url 'getDepartmentById' %}",
+	        data: {"DeptId": id},
+	        async:true,
+	        success: function (data) {
+	            if(data.status == "success"){
+	            	$("#EditDepartmentName").val(data.departmentName);
+	            	$("#EditDepartmentStatus").val(data.departmentStatus);
+	            	$("#editDepartmentId").val(data.departmentId);
+	            	$("#EditdepartmentProgressBar").hide();
+	            }else{
+	            	$("#EditdepartmentAlert").empty();
+	            	$("#EditdepartmentAlert").append(data.errormsg);
+	            	$("#EditdepartmentAlert").show();
+	            	setTimeout(function(){
+						$("#EditdepartmentAlert").hide("1000");
+					}, 4000);
+	            	$('#EditDepartmentBtn').prop("disabled", false);
+	            }
+	        },
+	        error: function (e) {
+	            alert("Error! please try again later.");
+	        }
+	    })
+
+	}
+
+	function EditPersonnelModal(){
+		$("#EditPersonnelModal").modal("show");
+	}
+
+	function EditDepartmentForm(){
+		$("#EditdepartmentProgressBar").empty();
+		$("#EditdepartmentProgressBar").append("Checking. . . ");
+		$("#EditdepartmentProgressBar").show();
+		$("#EditDepartmentbtn"). attr('disabled','disabled');
+		var departmentName = $("#EditDepartmentName").val();
+		var departmentId = $("#editDepartmentId").val();
+		$.ajax({
+	        type: "GET",
+	        url: "{% url 'getDepartmentByName' %}",
+	        data: {"DepartmentName": departmentName, "deptId": departmentId},
+	        async:true,
+	        success: function (data) {
+	            if(data.status == "available"){
+	            	$("#EditdepartmentProgressBar").empty();
+					$("#EditdepartmentProgressBar").append("Updating. . . ");
+	            	var departmentForm = $("#departmentEdit_form").serializeArray();
+					$.ajax({
+			            type: "POST",
+			            url: "{% url 'updateDepartment' %}",
+			            data: departmentForm,
+			            async:false,
+			            success: function (data) {
+			            	if(data.status == "success"){
+			            		$("#EditdepartmentProgressBar").empty();
+								$("#EditdepartmentProgressBar").append("Department Update!");
+								var params = new window.URLSearchParams(window.location.search);
+								if (params.get('target') == "Dept"){
+									location.reload(true);
+								}else{
+									window.location.search += 'target=Dept';
+								}	
+			            	}else{
+			            		$("#EditdepartmentProgressBar").hide();
+			            		$("#EditdepartmentAlert").empty();
+			                	$("#EditdepartmentAlert").append(data.errormsg);
+			                	$("#EditdepartmentAlert").show();
+			                	setTimeout(function(){
+									$("#EditdepartmentAlert").hide("3000");
+								}, 4000);
+			                	$('#EditDepartmentbtn').prop("disabled", false);
+			            	}
+			            },
+			            error: function (e) {
+			                alert("Error! please try again later.");
+			                $('#EditDepartmentbtn').prop("disabled", false);
+			            }
+			        })
+	            }else{
+	            	$("#EditdepartmentProgressBar").hide();
+	            	$("#EditdepartmentAlert").empty();
+	            	$("#EditdepartmentAlert").append(data.errormsg);
+	            	$("#EditdepartmentAlert").show();
+	            	setTimeout(function(){
+						$("#EditdepartmentAlert").hide("3000");
+					}, 4000);
+	            	$('#EditDepartmentbtn').prop("disabled", false);
+	            }
+	        },
+	        error: function (e) {
+	            alert("Error! please try again later.");
+	        }
+	    })
+	}
+
+	function submitPersonnelForm(){
+		$("#personnelProgressBar").show();
+		$("#personnelProgressBar").empty();
+		$("#personnelProgressBar").append("Checking . . .");
+		var validForm = checkPersonnelForm()
+		if (validForm == false){
+			$("#personnelProgressBar").empty();
+			$("#personnelProgressBar").hide();
+			return false;
+		}
+		var personnelForm = $("#personnel_form").serializeArray();
+		$.ajax({
+	        type: "POST",
+	        url: "{% url 'checkPersonnel' %}",
+	        data: personnelForm,
+	        async:false,
+	        success: function (data) {
+	            if (data.status == "available"){
+	            	$("#personnelProgressBar").empty();
+					$("#personnelProgressBar").append("Creating . . .");
+	            	$.ajax({
+			            type: "POST",
+			            url: "{% url 'createPersonnel' %}",
+			            data: personnelForm,
+			            async:false,
+			            success: function (data) {
+			                if (data.status == "success"){
+			                	$("#personnelProgressBar").empty();
+								$("#personnelProgressBar").append("Personnel Created!");
+			                	var params = new window.URLSearchParams(window.location.search);
+								if (params.get('target') == "Dept"){
+									window.location.replace("{% url 'personnelIndex' %}");
+								}else{
+									location.reload(true);
+								}	
+			                }else{
+			                	alert(data.errormsg)
+			                }
+			            },
+			            error: function (e) {
+			                alert("Error! please try again later.");
+			            }
+			        })
+	            }else{
+	            	alert(data.errormsg)
+	            }
+	        },
+	        error: function (e) {
+	            alert("Error! please try again later.");
+	        }
+	    })
+	}
+
+	function checkPersonnelForm(){
+		var FirstName = $("#FirstName").val();
+		var LastName = $("#LastName").val();
+		var Department = $("#Department").val();
+		var Username = $("#Username").val();
+		var Password = $("#Password").val();
+		if (FirstName == ""){
+			$("#FirstName").focus();
+			$("#personnelAlert").empty();
+			$("#personnelAlert").append("First name should not be empty!");
+			$("#personnelAlert").show();
+			setTimeout(function(){
+				$("#personnelAlert").hide("1000");
+			}, 4000);
+			return false;
+		}
+		if(LastName == ""){
+			$("#LastName").focus();
+			$("#personnelAlert").empty();
+			$("#personnelAlert").append("Last name should not be empty!");
+			$("#personnelAlert").show();
+			setTimeout(function(){
+				$("#personnelAlert").hide("1000");
+			}, 4000);
+			return false;
+		}
+		if(Department == 0){
+			$("#Department").focus();
+			$("#personnelAlert").empty();
+			$("#personnelAlert").append("Please choose a Department!");
+			$("#personnelAlert").show();
+			setTimeout(function(){
+				$("#personnelAlert").hide("1000");
+			}, 4000);
+			return false;
+		}
+		if (Username == ""){
+			$("#Username").focus();
+			$("#personnelAlert").empty();
+			$("#personnelAlert").append("Username should not be empty!");
+			$("#personnelAlert").show();
+			setTimeout(function(){
+				$("#personnelAlert").hide("1000");
+			}, 4000);
+			return false;
+		}
+		if (CheckPassword(Password) == false){
+			$("#Password").focus();
+			$("#personnelAlert").empty();
+			$("#personnelAlert").append("Your password is not strong enough or did not fit the requirement!");
+			$("#personnelAlert").show();
+			setTimeout(function(){
+				$("#personnelAlert").hide("1000");
+			}, 4000);
+			return false;
+		}
+
+		return true;
+	}
+
+	function CheckPassword(inputtxt) { 
+		var decimal =  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
+		if(inputtxt.match(decimal)){ 
+			return true;
+		}else{ 
+			return false;
+		}
+	} 
+	
+</script>
+</body>
+</html>
