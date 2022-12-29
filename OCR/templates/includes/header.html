@@ -1,0 +1,43 @@
+{% load staticfiles %}
+<nav class="navbar" style="background-color: #e3f2fd;">
+	<div class="container-fluid">
+    	<a class="navbar-brand" href="{% url 'OCRIndex' %}">
+    	<img src="{% static 'images/logo-RB.png' %}" alt="" width="30" height="24">OCR
+    	</a>
+    	
+    	<button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+      		Hi {{ user.username }}!
+    	</button>
+    	<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+	      	<div class="offcanvas-header">
+	       		<h5 class="offcanvas-title" id="offcanvasNavbarLabel">Actions</h5>
+	        	<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	      	</div>
+      	<div class="offcanvas-body">
+        	<ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+        		<!-- {% if user.is_active %}
+          		<li class="nav-item">
+            		<a class="nav-link active" aria-current="page" href="#">Account</a>
+          		</li>
+          		{% endif %} -->
+          		
+          		{% if user.is_superuser %}
+          		<li class="nav-item">
+            		<!-- <a class="nav-link" href="{% url 'personnelIndex' %}">Manage User</a> -->
+          		</li>
+          		{% endif %}
+
+          		{% if user.is_active %}
+          		<li class="nav-item">
+            		<a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          		</li>
+          		{% else %}
+          		<li class="nav-item">
+            		<a class="nav-link" href="{% url 'login' %}">Login</a>
+          		</li>
+          		{% endif %}
+          		
+        	</ul>
+      	</div>
+    </div>
+</nav>
