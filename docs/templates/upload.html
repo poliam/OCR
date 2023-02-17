@@ -1,0 +1,242 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Upload Document</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/mainstyle.css' %}">
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+	<style type="text/css">
+		.TagsName{
+			border-radius: 2px;
+		    color: #0d6efd;
+		    margin: 3px;
+		    padding: 0px 3px 1px 3px;
+		    background-color: #ced9e9;
+		}
+	</style>
+</head>
+<body>
+{% include "includes/header.html" %}
+<br><br/>
+<div class="container">
+	<div class="row">
+
+		<div class="col-md-3"></div>
+		<div class="col-md-6" style="background-color: white; box-shadow: 10px 10px 5px 0px #6a65654f; opacity: 0.85;">
+			<br/><br/>
+			<div class="row">
+				<div class="col-md-2"></div>
+				<div class="col-md-8">
+					<h3>UPLOAD DOCUMENT</h3>
+				</div>
+				<div class="col-md-2"></div>
+			</div>
+			<form id="document_form" method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentName" class="form-label">Document Name*</label>
+						  	<input type="text" class="form-control" name="DocumentName" id="DocumentName" placeholder="Document Name" required>
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentDescription" class="form-label">Document Description*</label>
+						  	<textarea  class="form-control" name="DocumentDescription" id="DocumentDescription" placeholder="Document Description"></textarea>
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentType" class="form-label">Document Type</label>
+						  	<select class="form-select" name="DocumentType" aria-label="Default select example" onchange="UpdateDocumentType(this)">
+							  	<option value="0">- - Select Document Type - -</option>
+							  	<!-- docTypeList -->
+								{% for docType in docTypeList %}
+									<option value="{{ docType.pk }}">{{ docType.name }}</option>
+								{% endfor %}
+								<option value="others">Others:</option>
+							</select>
+						</div>
+						<div class="mb-3" id="DocumentTypeOthers" style="display:none;">
+							<label for="DocumentType" class="form-label">New Document Type</label>
+							<input type="text" class="form-control" name="DocumentNewType" id="DocumentNewType" placeholder="DocumentType">
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentController" class="form-label">Document Controller #(Optional)</label>
+						  	<input type="text" class="form-control" name="DocumentController" id="DocumentController" placeholder="Document Control Number">
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class=" mb-3">
+							<label for="DocumentUpload" class="form-label">Upload Document</label>
+					  		<input type="file" class="form-control" name='upload_file' id="upload_file">
+						</div>	
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<label for="DocumentTag" class="form-label">Document Tags</label>
+						<div class="input-group">
+						  	<input type="text" class="form-control" id="TagsValue" aria-label="Tags" placeholder="Tags">
+						  	<div class="input-group-append">
+						    	<span style="cursor:pointer;" class="input-group-text" onclick="addTag()">Add Tags</span>
+						  	</div>
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+
+				
+				<br/>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8" id="TagWrapper" style="border: 1px solid black; border-radius: 10px; padding: 10px 5px; display: none;">
+						
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentName" class="form-label">Document Owner(Department)*</label>
+						  	<select class="form-select" name="DocumentOwner" aria-label="Default select example" required>
+							  	<option value="">Select Department</option>
+							  	{% for department in departments %}
+							  		<option value="{{ department.pk }}">{{ department.departmentName }}</option>
+							  	{% endfor%}
+							</select>
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<label class="switch">
+							<input type="checkbox" id="IsPublic" name="IsPublic"> Public Document
+  						</label>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<button type="button" onclick="SubmitUploadForm()" class="form-control btn btn-outline-info">Submit</button>
+
+						<button style="display: none;" type="submit" id="SubmitButton" class="form-control btn btn-outline-secondary">Submit</button>
+						<button style="margin-top: 10px;" type="button" class="btn btn-secondary form-control"><a href="{% url 'OCRIndex' %}" style="text-decoration: none; color: black;">Return</a></button>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div id="tagswrapper"></div>
+			</form>
+			<br/>
+		</div>
+		<div class="col-md-3"></div>
+	</div>
+</div>
+
+<form id="tagsForm">
+	
+</form>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+	function SubmitUploadForm(){
+		currentTags = $("#tagsForm").serializeArray();
+		$("#tagswrapper").empty();
+		if (currentTags.length != 0){
+			$.each(currentTags, function(index, value){
+				$("#tagswrapper").append("<input type='hidden' name='tags[]' value='"+value.value+"'>");
+			})
+		}
+		$("#SubmitButton").click();
+	}
+
+	function UpdateDocumentType(that){
+		var DocumentTypeValue = $(that).val();
+		if (DocumentTypeValue == "others"){
+			$("#DocumentTypeOthers").show();
+		}else{
+			$("#DocumentTypeOthers").hide();
+		}
+	}
+
+	function addTag() {
+		var TagsValue = $("#TagsValue").val();
+		if (TagsValue != ""){
+			currentTags = $("#tagsForm").serializeArray();
+			if (currentTags.length == 0){
+				$("#tagsForm").append("<input type='hidden' name='"+TagsValue+"' value='"+TagsValue+"'>");
+				$("#TagWrapper").empty();
+				$("#TagWrapper").append("<span class='TagsName'>"+TagsValue+" <svg style='cursor: pointer;' tagsValue='"+TagsValue+"' onclick='removeTags(this);' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-circle' viewBox='0 0 16 16'><path d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/><path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/></svg></span>");
+				$("#TagsValue").val("");
+				$("#TagWrapper").show();
+			}else{
+				var AlreadyATag = 0;
+				$.each(currentTags, function(index, value){
+					if (value.value == TagsValue){
+						AlreadyATag = 1;
+					}
+				})
+				if(AlreadyATag == 0){
+					$("#tagsForm").append("<input type='hidden' name='"+TagsValue+"' value='"+TagsValue+"'>");
+					$("#TagWrapper").append("<span class='TagsName'>"+TagsValue+" <svg style='cursor: pointer;' tagsValue='"+TagsValue+"' onclick='removeTags(this);' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-circle' viewBox='0 0 16 16'><path d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/><path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/></svg></span>");
+				}
+				$("#TagsValue").val("")
+			}
+		}
+	}
+
+	function removeTags(that){
+		var TagsValue = $(that).attr("tagsvalue");
+		currentTags = $("#tagsForm").serializeArray();
+		$("#tagsForm").empty();
+		$("#TagWrapper").empty();
+		$.each(currentTags, function(index, value){
+			if (value.value != TagsValue){
+				$("#tagsForm").append("<input type='hidden' name='"+value.value+"' value='"+value.value+"'>");
+				$("#TagWrapper").append("<span class='TagsName'>"+value.value+" <svg style='cursor: pointer;' tagsValue='"+value.value+"' onclick='removeTags(this);' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-circle' viewBox='0 0 16 16'><path d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/><path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/></svg></span>");
+				$("#TagsValue").val("")
+			}
+		})
+		currentTags = $("#tagsForm").serializeArray();
+		if(currentTags.length == 0){
+			$("#TagWrapper").hide();
+		}
+	}
+</script>
+</body>
+</html>

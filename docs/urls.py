@@ -5,7 +5,12 @@ from . import views
 
 urlpatterns = [
     path('', views.docsIndex, name='docsIndex'),
-    path('upload_file', views.uploadDocs, name="uploadDocs"),
+    path('upload', views.documentUpload, name='documentUpload'),
+    path('download/', views.downloadFile, name="downloadFile"),
+    path('search/', views.documentSearch, name='documentSearch'),
+    path('view_document/<int:document_id>', views.viewDocument, name='viewDocument'),
+    path('edit_document/<int:document_id>', views.editDocument, name='editDocument'),
+    path('update_documet/<int:document_id>', views.updateDocument, name='updateDocument'),
     
 ]
 if settings.DEBUG:

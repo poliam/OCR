@@ -1,0 +1,201 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Document Details</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/mainstyle.css' %}">
+	<style type="text/css">
+		.TagsName{
+			border-radius: 2px;
+		    color: #0d6efd;
+		    margin: 3px;
+		    padding: 0px 3px 1px 3px;
+		    background-color: #ced9e9;
+		}
+	</style>
+</head>
+<body>
+{% include "includes/header.html" %}
+<br/>
+<div class="container">
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-10" style="background-color: white; box-shadow: 10px 10px 5px 0px #6a65654f; opacity: 0.85;">
+			<br/><br/>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<h3>DOCUMENT DETAILS</h3>	
+				</div>
+				<div class="col-md-1"></div>
+							
+			</div>
+			<br/><br/>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-3">
+					<b>Document Name:</b>
+				</div>
+				<div class="col-md-7">
+					{{ DocumentDetails.name }}
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<hr>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-3">
+					<b>Document Controller:</b>
+				</div>
+				<div class="col-md-7">
+					{{ DocumentDetails.documentController }}
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<hr>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-3">
+					<b>Document Type:</b>
+				</div>
+				<div class="col-md-7">
+					{{ DocumentDetails.docType.name }}
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<hr>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-3">
+					<b>Document Owner(Department):</b>
+				</div>
+				<div class="col-md-7">
+					{{ DocumentDetails.docOwner.departmentName }}
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<hr>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-3">
+					<b>Public Document:</b>
+				</div>
+				<div class="col-md-7">
+					{% if DocumentDetails.is_public == 1 %}
+						YES
+					{% else %}
+						NO
+					{% endif %}
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<hr>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-3">
+					<b>Document Tags</b>
+				</div>
+				<div class="col-md-7" id="TagWrapper">
+					
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<hr>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-3">
+					<b>Document Description</b>
+				</div>
+				<div class="col-md-7">
+					{{ DocumentDetails.description }}
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<hr>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-3">
+					<b>Upload Document</b>
+				</div>
+				<div class="col-md-7">
+					{% if DocumentDetails.documentextention != "" %}
+						<a href="//localhost:8000/media/{{DocumentDetails.filePath}}">{{DocumentDetails.name}}.{{DocumentDetails.documentextention}}</a>
+					{% endif %}
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<hr>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-5">
+					<a href="{% url 'documentSearch' %}"><button type="button" class="form-control btn btn-outline-info">Return</button></a>
+				</div>
+				<div class="col-md-5">
+					<a href="{% url 'editDocument' documentId %}"><button type="button" class="form-control btn btn-outline-secondary">Edit</button></a>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<br/>
+		</div>
+		<div class="col-md-1"></div>
+	</div>
+</div>
+<form id="tagsForm">
+	{% for DocumentTag in DocumentTags %}
+		<input type='hidden' name='{{ DocumentTag.document_tag.name }}' value='{{ DocumentTag.document_tag.name }}'>
+	{% endfor %}
+</form>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		currentTags = $("#tagsForm").serializeArray();
+		if(currentTags.length != 0){
+			$.each(currentTags, function(index, value){
+				$("#TagWrapper").append("<span class='TagsName'>"+value.value+"</span>");
+			})
+		}
+	})
+</script>
+</body>
+</html>

@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.conf import settings
 # from pdf2image import convert_from_path
 # import PyPDF2
-# import cv2
-# import pytesseract
+import cv2
+import pytesseract
 # import uuid
 
 def OCRIndex(request):
@@ -46,12 +47,12 @@ def trialPDF(request):
 	
 
 def trialImage(request):
-	# pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
-
-	# img = cv2.imread("C:/Users/polia/Bitnami Django Stack projects/OCR/OCR/media/sample_image.jpg")
+	pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+	print(settings.MEDIA_ROOT)
+	img = cv2.imread(settings.MEDIA_ROOT+"sample_image.jpg")
 	# print(img)
-	# text = pytesseract.image_to_string(img)
-	# print()
+	text = pytesseract.image_to_string(img)
+	print(text)
 	return render(request, 'Homepage.html')
 
 	

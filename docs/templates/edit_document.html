@@ -1,0 +1,323 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Edit Document</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/mainstyle.css' %}">
+	<style type="text/css">
+		.TagsName{
+			border-radius: 2px;
+		    color: #0d6efd;
+		    margin: 3px;
+		    padding: 0px 3px 1px 3px;
+		    background-color: #ced9e9;
+		}
+		.tooltip {
+  			position: relative;
+  			display: contents;
+  			border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+		}
+
+/* Tooltip text */
+.tooltiptext {
+  visibility: hidden;
+  width: 400px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+	</style>
+</head>
+<body>
+{% include "includes/header.html" %}
+<br/>
+<div class="container">
+	<div class="row">
+
+		<div class="col-md-3"></div>
+		<div class="col-md-6" style="background-color: white; box-shadow: 10px 10px 5px 0px #6a65654f; opacity: 0.85;">
+			<br/><br/>
+			<div class="row">
+				<div class="col-md-2"></div>
+				<div class="col-md-8">
+					<h3>EDIT DOCUMENT</h3>
+				</div>
+				<div class="col-md-2"></div>
+			</div>
+			<form id="document_form" method="POST" enctype="multipart/form-data">
+				<div class="alert alert-success" role="alert">
+				  	Successfully added!!
+				</div>
+				{% csrf_token %}
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentName" class="form-label">Document Name*</label>
+						  	<input type="text" class="form-control" name="DocumentName" id="DocumentName" placeholder="Document Name" value="{{ DocumentDetails.name }}" required>
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentDescription" class="form-label">Document Description*</label>
+						  	<textarea  class="form-control" name="DocumentDescription" id="DocumentDescription" placeholder="Document Description" >{{ DocumentDetails.description }}</textarea>
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentType" class="form-label">Document Type</label>
+						  	<select class="form-select" name="DocumentType" aria-label="Default select example" onchange="UpdateDocumentType(this)">
+							  	<option value="0">- - Select Document Type - -</option>
+								{% for docType in docTypeList %}
+									{% if DocumentDetails.docType.id == docType.pk %}
+										<option value="{{ docType.pk }}" selected>{{ docType.name }}</option>
+									{% else %}
+										<option value="{{ docType.pk }}">{{ docType.name }}</option>
+									{% endif %}
+								{% endfor %}
+								{% if DocumentDetails.docType is None %}
+									<option value="others" selected>Others:</option>
+								{% else %}
+									<option value="others">Others:</option>
+								{% endif %}
+							</select>
+						</div>
+						<div class="mb-3" id="DocumentTypeOthers" style="display:none;">
+							<label for="DocumentType" class="form-label">New Document Type</label>
+							<input type="text" class="form-control" name="DocumentNewType" id="DocumentNewType" placeholder="DocumentType">
+						</div>	
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentController" class="form-label">Document Controller #(Optional)</label>
+						  	<input type="text" class="form-control" name="DocumentController" id="DocumentController" placeholder="Document Control Number" value="{{ DocumentDetails.documentController }}">
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						{% if DocumentDetails.documentextention != "" %}
+							<div class=" mb-3">
+								<label for="DocumentUpload" class="form-label">Upload Document	<div class="tooltip">
+																									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+  																										<path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+																									</svg>
+  																									<span class="tooltiptext">for now you can only upload 
+  																																(docx, pdf and images files).<br/>
+  																																you can upload it but we cannot ready the text inside.</span>
+																								</div>
+ 																								<br/>
+									<a href="//localhost:8000/media/{{DocumentDetails.filePath}}">{{DocumentDetails.name}}.{{DocumentDetails.documentextention}}</a> <br/><input type="checkbox" id="vehicle3" name="deleteUpload" value="1">Remove file upload</label>
+						  		<input type="file" class="form-control" name='upload_file' id="upload_file">
+							</div>	
+						{% else %}
+							<div class=" mb-3">
+								<label for="DocumentUpload" class="form-label">Upload Document</label>
+						  		<input type="file" class="form-control" name='upload_file' id="upload_file">
+							</div>	
+						{% endif %}
+						
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<label for="DocumentTag" class="form-label">Document Tags</label>
+						<div class="input-group">
+						  	<input type="text" class="form-control" id="TagsValue" aria-label="Tags" placeholder="Tags">
+						  	<div class="input-group-append">
+						    	<span style="cursor:pointer;" class="input-group-text" onclick="addTag()">Add Tags</span>
+						  	</div>
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+
+				
+				<br/>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8" id="TagWrapper" style="border: 1px solid black; border-radius: 10px; padding: 10px 5px; display: none;">
+						
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="mb-3">
+						  	<label for="DocumentName" class="form-label">Document Owner(Department)*</label>
+						  	<select class="form-select" name="DocumentOwner" aria-label="Default select example" required>
+							  	<option value="">Select Department</option>
+							  	{% for department in departments %}
+							  		{% if department.pk == DocumentDetails.docOwner.id %}
+							  			<option value="{{ department.pk }}" selected>{{ department.departmentName }}</option>
+							  		{% else %}
+							  			<option value="{{ department.pk }}">{{ department.departmentName }}</option>
+							  		{% endif %}
+							  	{% endfor%}
+							</select>
+						</div>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<label class="switch">
+							{% if DocumentDetails.is_public == 1 %}
+								<input type="checkbox" id="IsPublic" name="IsPublic" checked> Public Document
+							{% else %}
+								<input type="checkbox" id="IsPublic" name="IsPublic"> Public Document
+							{% endif %}
+  						
+							
+  					</label>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-4">
+						<a href="{% url 'viewDocument' documentId %}"><button type="button" class="form-control btn btn-outline-secondary">Return</button></a>
+					</div>
+					<div class="col-md-4">
+						<button type="button" onclick="SubmitUploadForm(this)" class="form-control btn btn-outline-primary">Update</button>
+						<button style="display: none;" type="submit" id="SubmitButton" class="form-control btn btn-outline-secondary">Submit</button>
+					</div>
+					<div class="col-md-2"></div>
+				</div>
+				<div id="tagswrapper"></div>
+			</form>
+			<br/>
+		</div>
+		<div class="col-md-3"></div>
+	</div>
+</div>
+<form id="tagsForm">
+	{% for DocumentTag in DocumentTags %}
+		<input type='hidden' name='{{ DocumentTag.document_tag.name }}' value='{{ DocumentTag.document_tag.name }}'>
+	{% endfor %}
+</form>
+
+<input type="hidden" name="isUpdated" id="isUpdated" value="{{ updated }}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		currentTags = $("#tagsForm").serializeArray();
+		if(currentTags.length != 0){
+			$.each(currentTags, function(index, value){
+				console.log("here")
+				$("#TagWrapper").append("<span class='TagsName'>"+value.value+" <svg style='cursor: pointer;' tagsValue='"+value.value+"' onclick='removeTags(this);' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-circle' viewBox='0 0 16 16'><path d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/><path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/></svg></span>");
+			})
+			$("#TagWrapper").show();
+		}
+		if ($("#isUpdated").val() == 1){
+			setTimeout(function() { 
+		        $(".alert-success").hide(1000);
+		    }, 2000);
+		}else{
+			$(".alert-success").hide();
+		}
+	})
+	function SubmitUploadForm(that){
+		$(that).empty();
+		$(that).append("updating . . .");
+		currentTags = $("#tagsForm").serializeArray();
+		$("#tagswrapper").empty();
+		if (currentTags.length != 0){
+			$.each(currentTags, function(index, value){
+				$("#tagswrapper").append("<input type='hidden' name='tags[]' value='"+value.value+"'>");
+			})
+		}
+		$("#SubmitButton").click();
+	}
+
+	function UpdateDocumentType(that){
+		var DocumentTypeValue = $(that).val();
+		if (DocumentTypeValue == "others"){
+			$("#DocumentTypeOthers").show();
+		}else{
+			$("#DocumentTypeOthers").hide();
+		}
+	}
+
+	function addTag() {
+		var TagsValue = $("#TagsValue").val();
+		if (TagsValue != ""){
+			currentTags = $("#tagsForm").serializeArray();
+			if (currentTags.length == 0){
+				$("#tagsForm").append("<input type='hidden' name='"+TagsValue+"' value='"+TagsValue+"'>");
+				$("#TagWrapper").empty();
+				$("#TagWrapper").append("<span class='TagsName'>"+TagsValue+" <svg style='cursor: pointer;' tagsValue='"+TagsValue+"' onclick='removeTags(this);' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-circle' viewBox='0 0 16 16'><path d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/><path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/></svg></span>");
+				$("#TagsValue").val("");
+				$("#TagWrapper").show();
+			}else{
+				var AlreadyATag = 0;
+				$.each(currentTags, function(index, value){
+					if (value.value == TagsValue){
+						AlreadyATag = 1;
+					}
+				})
+				if(AlreadyATag == 0){
+					$("#tagsForm").append("<input type='hidden' name='"+TagsValue+"' value='"+TagsValue+"'>");
+					$("#TagWrapper").append("<span class='TagsName'>"+TagsValue+" <svg style='cursor: pointer;' tagsValue='"+TagsValue+"' onclick='removeTags(this);' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-circle' viewBox='0 0 16 16'><path d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/><path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/></svg></span>");
+				}
+				$("#TagsValue").val("")
+			}
+		}
+	}
+
+	function removeTags(that){
+		var TagsValue = $(that).attr("tagsvalue");
+		currentTags = $("#tagsForm").serializeArray();
+		$("#tagsForm").empty();
+		$("#TagWrapper").empty();
+		$.each(currentTags, function(index, value){
+			if (value.value != TagsValue){
+				$("#tagsForm").append("<input type='hidden' name='"+value.value+"' value='"+value.value+"'>");
+				$("#TagWrapper").append("<span class='TagsName'>"+value.value+" <svg style='cursor: pointer;' tagsValue='"+value.value+"' onclick='removeTags(this);' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x-circle' viewBox='0 0 16 16'><path d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/><path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/></svg></span>");
+				$("#TagsValue").val("")
+			}
+		})
+		currentTags = $("#tagsForm").serializeArray();
+		if(currentTags.length == 0){
+			$("#TagWrapper").hide();
+		}
+	}
+</script>
+</body>
+</html>
